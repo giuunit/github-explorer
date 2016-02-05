@@ -1,0 +1,46 @@
+{
+  "name": "github-explorer",
+  "version": "1.0.0",
+  "description": "custom project that goes through github to get keywords based on custom tests",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server",
+    "server": "nodemon server/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/giuunit/"
+  },
+  "keywords": [
+    "angularjs",
+    "github-api"
+  ],
+  "author": "Giu",
+  "license": "MIT",
+  "dependencies": {
+    "angular": "^1.4.9",
+    "angular-route": "^1.4.9",
+    "body-parser": "^1.14.2",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "satellizer": "^0.13.4"
+  },
+  "devDependencies": {
+    "babel": "^6.3.26",
+    "babel-code-frame": "^6.3.13",
+    "babel-core": "^6.4.5",
+    "babel-helper-replace-supers": "^6.3.13",
+    "babel-loader": "^6.2.1",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-template": "^6.3.13",
+    "babel-traverse": "^6.4.5",
+    "babel-types": "^6.4.5",
+    "css-loader": "^0.23.1",
+    "invariant": "^2.2.0",
+    "live-server": "^0.9.1",
+    "mocha": "^2.3.4",
+    "nodemon": "^1.8.1",
+    "style-loader": "^0.13.0",
+    "webpack": "^1.12.13"
+  }
+}
