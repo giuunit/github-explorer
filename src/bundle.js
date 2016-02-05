@@ -15149,23 +15149,20 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	   value: true
+	    value: true
 	});
 	exports.default = RouteConfig;
-	function RouteConfig($routeProvider) {
-	   $routeProvider.when('/', {
-	      templateUrl: './modules/default/default.html',
-	      controller: 'DefaultController',
-	      controllerAs: 'default'
-	   }).when('/callback:id', {
-	      templateUrl: './modules/callback/callback.html'
-	   }).when('/auth/github', {
-	      controller: 'OAuthController'
-	   }).otherwise({
-	      templateUrl: './modules/default/default.html',
-	      controller: 'DefaultController',
-	      controllerAs: 'default'
-	   });;
+	function RouteConfig($routeProvider, $locationProvider) {
+	    $routeProvider.when('/', {
+	        templateUrl: './modules/default/default.html',
+	        controller: 'DefaultController',
+	        controllerAs: 'default'
+	    }).when('/auth/:provider', {
+	        controller: 'OAuthController',
+	        templateUrl: './modules/auth/auth.html'
+	    }).otherwise({
+	        redirectTo: '/'
+	    });
 	}
 
 /***/ },
@@ -15181,8 +15178,8 @@
 	function OAuthConfig($authProvider) {
 	  $authProvider.github({
 	    clientId: '6151497cc320dd5543ec',
-	    redirectUri: 'http://localhost:8080/src/callback',
-	    url: 'http://localhost:8080/src/auth/callback'
+	    redirectUri: window.location.origin + '/callback',
+	    url: 'http://localhost:3000/auth/github'
 	  });
 	}
 

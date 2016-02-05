@@ -6,7 +6,7 @@ import oauth from './oauth'
 import 'angular-route';
 import 'satellizer';
 
-angular.module('gitEx', ['ngRoute', 'default' , 'satellizer'])
+angular.module('gitEx', ['ngRoute', 'default', 'satellizer'])
    .config(routes)
    .config(oauth);
 

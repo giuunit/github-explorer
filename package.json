@@ -4,7 +4,7 @@
   "description": "custom project that goes through github to get keywords based on custom tests",
   "main": "index.js",
   "scripts": {
-    "start": "live-server",
+    "start": "live-server ./src",
     "server": "nodemon server/"
   },
   "repository": {
@@ -35,11 +35,13 @@
     "babel-template": "^6.3.13",
     "babel-traverse": "^6.4.5",
     "babel-types": "^6.4.5",
+    "connect": "^3.4.1",
     "css-loader": "^0.23.1",
     "invariant": "^2.2.0",
     "live-server": "^0.9.1",
     "mocha": "^2.3.4",
     "nodemon": "^1.8.1",
+    "serve-static": "^1.10.2",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.13"
   }

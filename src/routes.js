@@ -1,19 +1,15 @@
-export default function RouteConfig($routeProvider) {
+export default function RouteConfig($routeProvider, $locationProvider) {
   $routeProvider
-     .when('/', {
+    .when('/', {
         templateUrl: './modules/default/default.html',
         controller: 'DefaultController',
         controllerAs: 'default'
-     })
-     .when('/callback:id',{
-        templateUrl: './modules/callback/callback.html',
-     })
-     .when('/auth/github',{
-         controller: 'OAuthController'
-     })
-     .otherwise({
-        templateUrl: './modules/default/default.html',
-        controller: 'DefaultController',
-        controllerAs: 'default'
-     });;
+    })
+    .when('/auth/:provider',{
+        controller: 'OAuthController',
+        templateUrl: './modules/auth/auth.html',
+    })
+    .otherwise({
+        redirectTo: '/'
+    });
 }
