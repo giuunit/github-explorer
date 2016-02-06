@@ -1,5 +1,4 @@
-import angular from './lib/';
-
+import 'angular';
 import './modules/default/';
 import routes from './routes';
 import oauth from './oauth'

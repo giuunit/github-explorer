@@ -25,7 +25,6 @@ var userSchema = new mongoose.Schema({
   email: { type: String, unique: true, lowercase: true },
   password: { type: String, select: false },
   displayName: String,
-  picture: String,
   bitbucket: String,
   github: String,
   linkedin: String,
@@ -173,7 +172,7 @@ app.post('/auth/github', function(req, res) {
       if (req.headers.authorization) {
         User.findOne({ github: profile.id }, function(err, existingUser) {
           if (existingUser) {
-            return res.status(409).send({ message: 'There is already a GitHub account that belongs to you' });
+            return res.send({ token: createJWT(existingUser) });
           }
           var token = req.headers.authorization.split(' ')[1];
           var payload = jwt.decode(token, config.TOKEN_SECRET);
@@ -182,7 +181,6 @@ app.post('/auth/github', function(req, res) {
               return res.status(400).send({ message: 'User not found' });
             }
             user.github = profile.id;
-            user.picture = user.picture || profile.avatar_url;
             user.displayName = user.displayName || profile.name;
             user.save(function() {
               var token = createJWT(user);

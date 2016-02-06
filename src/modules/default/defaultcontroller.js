@@ -1,14 +1,29 @@
-export default function DefaultController($auth) {
-  this.title = "Welcome to the github explorer, please authenticate";
+export default function DefaultController($auth, ProfileService, github) {
+  this.title = "Welcome to the github explorer";
+  
+  this.token = localStorage.getItem('token');
+  
+  if(this.token){
+    ProfileService.getProfile().then((response)=>{
+        this.user = github.SimpleUser(response.data);
+    });
+  }
   
   this.authenticate = function(provider){
       
       $auth.authenticate(provider)
-        .then(function(response){
-          console.log(response);
-      })
+        .then((response)=>{
+            this.token = response.data.token;
+            localStorage.setItem('token', response.data.token);
+            
+            ProfileService.getProfile().then((response)=>{
+                this.user = github.SimpleUser(response.data);
+            });
+        })
+
       .catch(function(response){
-          console.log(response);
+          //TODO replace with a decent error message
+          console.log("Error occured while trying to connect to github");
       });
   }
 }
