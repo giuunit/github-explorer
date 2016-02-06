@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "custom project that goes through github to get keywords based on custom tests",
   "main": "index.js",
-  "scripts": {
-    "start": "live-server ./src",
-    "server": "nodemon server/"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/giuunit/"
@@ -38,7 +34,6 @@
     "connect": "^3.4.1",
     "css-loader": "^0.23.1",
     "invariant": "^2.2.0",
-    "live-server": "^0.9.1",
     "mocha": "^2.3.4",
     "nodemon": "^1.8.1",
     "serve-static": "^1.10.2",
