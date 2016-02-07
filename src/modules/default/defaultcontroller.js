@@ -5,7 +5,12 @@ export default function DefaultController($auth, ProfileService, github) {
   
   if(this.token){
     ProfileService.getProfile().then((response)=>{
+        
         this.user = github.SimpleUser(response.data);
+        
+        ProfileService.details().then((response)=>{
+           console.log(response); 
+        });
     });
   }
   
@@ -25,5 +30,11 @@ export default function DefaultController($auth, ProfileService, github) {
           //TODO replace with a decent error message
           console.log("Error occured while trying to connect to github");
       });
+  }
+  
+  this.disconnect = function(){
+      localStorage.removeItem('token');
+      
+      this.token = undefined;
   }
 }

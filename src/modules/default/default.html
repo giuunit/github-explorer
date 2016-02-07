@@ -3,10 +3,11 @@
 </div>
 
 <div ng-show="!default.token" class="row">
-    <button ng-click="default.authenticate('github');">Sign in with GitHub</button>
+    <button ng-click="default.authenticate('github')">Sign in with GitHub</button>
 </div>
 
 <div ng-show="default.token" class="row">
     <span>Welcome </span><span ng-bind="default.user.displayName"></span>
     <img width="230" height="230" ng-src="{{default.user.picture}}" />
+    <button ng-click="default.disconnect()">Disconnect</button>
 </div>

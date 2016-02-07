@@ -6,4 +6,8 @@ export default function ProfileService($http){
     this.updateProfile = function(profileData) {
         return $http.put('/api/me', profileData);
     }
+    
+    this.details = function(){
+        return $http.get('/api/details');
+    }
 }

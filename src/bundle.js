@@ -29783,7 +29783,12 @@
 	
 	    if (this.token) {
 	        ProfileService.getProfile().then(function (response) {
+	
 	            _this.user = github.SimpleUser(response.data);
+	
+	            ProfileService.details().then(function (response) {
+	                console.log(response);
+	            });
 	        });
 	    }
 	
@@ -29801,6 +29806,12 @@
 	            //TODO replace with a decent error message
 	            console.log("Error occured while trying to connect to github");
 	        });
+	    };
+	
+	    this.disconnect = function () {
+	        localStorage.removeItem('token');
+	
+	        this.token = undefined;
 	    };
 	}
 
@@ -29821,6 +29832,10 @@
 	
 	    this.updateProfile = function (profileData) {
 	        return $http.put('/api/me', profileData);
+	    };
+	
+	    this.details = function () {
+	        return $http.get('/api/details');
 	    };
 	}
 
