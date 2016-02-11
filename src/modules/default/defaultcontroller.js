@@ -3,17 +3,25 @@ export default function DefaultController($auth, ProfileService, github) {
   
   this.token = localStorage.getItem('token');
   
-  if(this.token){
-    ProfileService.getProfile().then((response)=>{
+    this.onAuthenticated = function(){
+        ProfileService.getProfile().then((response)=>{
         
-        this.user = github.SimpleUser(response.data);
-        
-        ProfileService.details().then((response)=>{
-           console.log(response); 
+            this.user = github.SimpleUser(response.data);
+            
+            ProfileService.repos().then((response)=>{
+                console.log(response.data); 
+                
+                ProfileService.skills().then((response)=>{
+                    console.log(response.data);
+                })
+            });
         });
-    });
-  }
+    } 
   
+  if(this.token){
+      this.onAuthenticated();
+  }
+
   this.authenticate = function(provider){
       
       $auth.authenticate(provider)
@@ -21,9 +29,7 @@ export default function DefaultController($auth, ProfileService, github) {
             this.token = response.data.token;
             localStorage.setItem('token', response.data.token);
             
-            ProfileService.getProfile().then((response)=>{
-                this.user = github.SimpleUser(response.data);
-            });
+            this.onAuthenticated();
         })
 
       .catch(function(response){

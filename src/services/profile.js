@@ -10,4 +10,12 @@ export default function ProfileService($http){
     this.details = function(){
         return $http.get('/api/details');
     }
+    
+    this.repos = function(){
+        return $http.get('/api/repos');
+    }
+    
+    this.skills = function(){
+        return $http.get('/api/skills');
+    }
 }

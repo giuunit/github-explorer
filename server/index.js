@@ -21,37 +21,23 @@ var request = require('request');
 var https = require('https');
 
 var config = require('./config');
+var skills = require('./keywords');
+
+var keywordSchema = new mongoose.Schema({
+    name: String
+});
 
 var userSchema = new mongoose.Schema({
-  email: { type: String, unique: true, lowercase: true },
-  password: { type: String, select: false },
-  displayName: String,
-  bitbucket: String,
-  github: String,
-  linkedin: String,
-  accessToken: String
+    email: { type: String, unique: true, lowercase: true },
+    displayName: String,
+    github: String,
+    accessToken: String,
+    login: String, 
+    keywords : [{ type: mongoose.Schema.ObjectId, ref: 'Keyword' }]
 });
-
-userSchema.pre('save', function(next) {
-  var user = this;
-  if (!user.isModified('password')) {
-    return next();
-  }
-  bcrypt.genSalt(10, function(err, salt) {
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      user.password = hash;
-      next();
-    });
-  });
-});
-
-userSchema.methods.comparePassword = function(password, done) {
-  bcrypt.compare(password, this.password, function(err, isMatch) {
-    done(err, isMatch);
-  });
-};
 
 var User = mongoose.model('User', userSchema);
+var Keyword = mongoose.model('Keyword', keywordSchema);
 
 mongoose.connect(config.MONGO_URI);
 mongoose.connection.on('error', function(err) {
@@ -131,6 +117,7 @@ app.get('/api/me', ensureAuthenticated, function(req, res) {
         toReturn.id = user.id;
         toReturn.displayName = user.displayName;
         toReturn.github = user.github;
+        toReturn.login = user.login;
         
         res.send(toReturn);
     });
@@ -193,6 +180,7 @@ app.post('/auth/github', function(req, res) {
             user.github = profile.id;
             user.displayName = user.displayName || profile.name;
             user.accessToken = accessTokenInfoObj.access_token;
+            user.login = profile.login;
             
             user.save(function() {
               var token = createJWT(user);
@@ -211,6 +199,7 @@ app.post('/auth/github', function(req, res) {
           user.github = profile.id;
           user.picture = profile.avatar_url;
           user.displayName = profile.name;
+          user.login = profile.login;
           
           user.accessToken = accessTokenInfoObj.access_token;
           user.save(function() {
@@ -253,11 +242,10 @@ app.get('/api/details', ensureAuthenticated, function(req,res){
     var body = "";
     
     User.findById(req.user, function(err, user) {
-        var token = user.accessToken;
 
         var githubRes = https.get({
             host : "api.github.com",
-            path: '/user?access_token=' + token,
+            path: '/user?access_token=' + user.accessToken,
             headers: {'user-agent': 'github-explorer-server'},
         }, (response) => {
             
@@ -278,13 +266,119 @@ app.get('/api/details', ensureAuthenticated, function(req,res){
     });
 });
 
+app.get('/api/repos',ensureAuthenticated, function(req, res){
+    var body = "";
+    var repos;
+    
+    User.findById(req.user).populate('keywords').exec(function(err, user) {
+
+        var githubRes = https.get({
+            host : "api.github.com",
+            path: '/user/repos?access_token=' + user.accessToken + "&type=owner",
+            headers: {'user-agent': 'github-explorer-server'},
+        }, (response) => {
+            
+            response.on('data',(d)=>{
+                body += d;
+            });
+            
+            response.on('end', ()=>{
+                repos = JSON.parse(body);
+                
+                if(!Array.isArray(repos))
+                    res.status(500).send({ message: 'Error while requesting the list of repos, see logs for details' });
+                                
+                var simpleRepoList = repos.map((repo)=> { return {
+                    name : repo.name,
+                    description: repo.description
+                }});
+
+                //list of unique languages 
+                var languages = repos.map((repo) => repo.language).filter((value,index,self)=>self.indexOf(value)===index);
+                var languageIds = keywordsCache.filter((item)=>languages.indexOf(item.name) !== -1);
+                
+                if(languageIds.length > 0){
+                    
+                    for(var i=0;i<languageIds.length;i++){
+                        
+                        var test = true;
+                        for(var j=0;j<user.keywords.length;j++){
+
+                            if(languageIds[i]._id.equals(user.keywords[j]._id)){
+                                test = false;
+                                break;
+                            }
+                        }
+                        
+                        //new element
+                        if(test)
+                            user.keywords.push(languageIds[i]._id);    
+                    }
+                    
+                    user.save();
+                }
+
+                res.send(simpleRepoList);
+            });
+        });
+        
+        githubRes.on('error', (e) => {
+            console.error(e);
+        });
+            
+        githubRes.end();
+    });
+});
+
+app.get('/api/skills', ensureAuthenticated, function(req, res){
+     User.findById(req.user).populate('keywords').exec(function(err, user) {
+         res.send(user.keywords);
+     });
+});
+
 /*
  |--------------------------------------------------------------------------
  | Start the Server
  |--------------------------------------------------------------------------
  */
+
+var keywordsCache;
+
 app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
   var staticPath = path.join(__dirname, '../src');
   console.log('Site hosted at : ' + staticPath);
+  
+  console.log('checking the keyword table');
+  
+  //test if the collection contains at least one element
+    Keyword.find((err, keywords)=> {
+      
+      //no element
+      if(keywords.length == 0) {
+          //we convert every skill into a keyword
+          for(var i=0;i<skills.items.length;i++){
+              var keyword = new Keyword({name:skills.items[i]});
+              keyword.save();
+              keywords.push(keyword);
+          }
+      }
+      
+      //elements in db
+      else {
+          var simpleKeywordList = keywords.map((keyword)=>keyword.name);
+
+          var newSkills = skills.items.filter((skill)=>simpleKeywordList.indexOf(skill) === -1);
+          
+          newSkills.forEach((item)=>{
+              var keyword = new Keyword({name:item});
+              keyword.save();
+              keywords.push(keyword);
+          });
+      }
+      
+        console.log('Keyword table filled');
+        keywordsCache = keywords;
+      
+    });    
 });

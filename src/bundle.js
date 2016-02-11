@@ -29775,21 +29775,29 @@
 	});
 	exports.default = DefaultController;
 	function DefaultController($auth, ProfileService, github) {
-	    var _this = this;
-	
 	    this.title = "Welcome to the github explorer";
 	
 	    this.token = localStorage.getItem('token');
 	
-	    if (this.token) {
+	    this.onAuthenticated = function () {
+	        var _this = this;
+	
 	        ProfileService.getProfile().then(function (response) {
 	
 	            _this.user = github.SimpleUser(response.data);
 	
-	            ProfileService.details().then(function (response) {
-	                console.log(response);
+	            ProfileService.repos().then(function (response) {
+	                console.log(response.data);
+	
+	                ProfileService.skills().then(function (response) {
+	                    console.log(response.data);
+	                });
 	            });
 	        });
+	    };
+	
+	    if (this.token) {
+	        this.onAuthenticated();
 	    }
 	
 	    this.authenticate = function (provider) {
@@ -29799,9 +29807,7 @@
 	            _this2.token = response.data.token;
 	            localStorage.setItem('token', response.data.token);
 	
-	            ProfileService.getProfile().then(function (response) {
-	                _this2.user = github.SimpleUser(response.data);
-	            });
+	            _this2.onAuthenticated();
 	        }).catch(function (response) {
 	            //TODO replace with a decent error message
 	            console.log("Error occured while trying to connect to github");
@@ -29836,6 +29842,14 @@
 	
 	    this.details = function () {
 	        return $http.get('/api/details');
+	    };
+	
+	    this.repos = function () {
+	        return $http.get('/api/repos');
+	    };
+	
+	    this.skills = function () {
+	        return $http.get('/api/skills');
 	    };
 	}
 
