@@ -1,13 +1,49 @@
-<div class="row">
-    <span ng-bind="default.title"></span>
+
+<div class="section no-pad-bot">
+    <div class="container">
+        <h2 class="header center orange-text">Welcome to Github Explorer</h2>
+        <div class="row center">
+            <h5 class="header col s12 light">The future of code analysis</h5>
+        </div>
+        <div ng-show="!default.token" class="row center">
+            <button class="btn-large waves-effect waves-light orange" ng-click="default.authenticate('github')">Sign in with GitHub</button>
+        </div>
+        
+        <div ng-show="default.token" class="row center">
+            <div class="col s4 m4">
+                <div class="card">
+                    <div class="card-image">
+                        <img class="responsive-img" ng-src="{{default.user.picture}}" />
+                        <span ng-bind="default.user.displayName" class="card-title"></span>
+                    </div>
+                    <div class="card-content">
+                        <span ng-repeat="skill in default.skills">
+                            <div class="chip" ng-bind="skill.name"></div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col s8 m8">
+            
+                <div ng-show="default.repos.length">
+                    <ul class="collection with-header">
+                        <li class="collection-header"><h5>My repositories</h5></li>
+                        <li ng-repeat="repo in default.repos" class="collection-item">
+                            <div ng-bind="repo.name"></div>
+                            <div class="description" ng-bind="repo.description"></div>
+                        </li>
+                    </ul> 
+                </div>
+                <div ng-show="!default.repos.length">
+                    <span>You don't own any repo</span>
+                </div>
+            </div>
+            
+            <div class="row center">
+                <button class="btn-large waves-effect waves-light orange" ng-click="default.disconnect()">Disconnect</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div ng-show="!default.token" class="row">
-    <button ng-click="default.authenticate('github')">Sign in with GitHub</button>
-</div>
-
-<div ng-show="default.token" class="row">
-    <span>Welcome </span><span ng-bind="default.user.displayName"></span>
-    <img width="230" height="230" ng-src="{{default.user.picture}}" />
-    <button ng-click="default.disconnect()">Disconnect</button>
-</div>

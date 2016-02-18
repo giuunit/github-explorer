@@ -29787,10 +29787,10 @@
 	            _this.user = github.SimpleUser(response.data);
 	
 	            ProfileService.repos().then(function (response) {
-	                console.log(response.data);
+	                _this.repos = response.data;
 	
 	                ProfileService.skills().then(function (response) {
-	                    console.log(response.data);
+	                    _this.skills = response.data;
 	                });
 	            });
 	        });

@@ -1,6 +1,4 @@
 export default function DefaultController($auth, ProfileService, github) {
-  this.title = "Welcome to the github explorer";
-  
   this.token = localStorage.getItem('token');
   
     this.onAuthenticated = function(){
@@ -9,10 +7,10 @@ export default function DefaultController($auth, ProfileService, github) {
             this.user = github.SimpleUser(response.data);
             
             ProfileService.repos().then((response)=>{
-                console.log(response.data); 
+                this.repos = response.data;
                 
                 ProfileService.skills().then((response)=>{
-                    console.log(response.data);
+                    this.skills = response.data
                 })
             });
         });
